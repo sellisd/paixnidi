@@ -15,7 +15,7 @@ app = FastAPI()
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080", "http://127.0.0.1:8080", "https://sellisd.github.io"],
+    allow_origins=["http://localhost:8080", "http://127.0.0.1:8080", "https://sellisd.github.io","null"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -79,8 +79,11 @@ def create_game(game_request: CreateGameRequest):
 
 @app.post("/game/{game_id}/join")
 async def join_game(game_id: str, request: JoinGameRequest):
+    print(f"Request received: game_id={game_id}, request={request}")
     if game_id not in games:
         raise HTTPException(status_code=404, detail="Game not found")
+    print(games)
+    print(games[game_id])
     if games[game_id]["player2"]:
         raise HTTPException(status_code=400, detail="Game is full")
     

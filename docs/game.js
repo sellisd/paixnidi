@@ -1,11 +1,13 @@
 const CONFIG = {
   apiUrl: localStorage.getItem('apiUrl') || '192.168.1.6',
-  port: localStorage.getItem('port') || 8080
+  port: localStorage.getItem('port') || 8080,
+  username: localStorage.getItem('username') || 'player1'
 };
 
 function saveConfig() {
   const apiUrl = document.getElementById('apiUrl').value.trim();
   const port = document.getElementById('portNumber').value.trim();
+  const username = document.getElementById('username').value.trim();
 
   if (!apiUrl || !port) {
       showError('configError', 'Please enter both API URL and port');
@@ -14,12 +16,13 @@ function saveConfig() {
 
   localStorage.setItem('apiUrl', apiUrl);
   localStorage.setItem('port', port);
+  localStorage.setItem('username', username);
   CONFIG.apiUrl = apiUrl;
   CONFIG.port = port;
+  CONFIG.username = username;
 
   const errorElement = document.getElementById('configError');
   errorElement.textContent = 'Configuration saved';
-  errorElement.classList.remove('hidden');
 }
 
 let currentPlayer = '';
@@ -32,12 +35,6 @@ function showError(elementId, message) {
 }
 
 async function createGame() {
-    const playerName = document.getElementById('playerName').value.trim();
-    if (!playerName) {
-        showError('createGameError', 'Please enter your name');
-        return;
-    }
-
     try {
         const response = await fetch(`http://${CONFIG.apiUrl}:${CONFIG.port}/game/new`, {
             method: 'POST',
@@ -45,7 +42,7 @@ async function createGame() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ 
-                player1: playerName,
+                player1: CONFIG.username,
                 player2: ""
             })
         });
@@ -55,8 +52,7 @@ async function createGame() {
         }
         
         const data = await response.json();
-        document.getElementById('currentGameId').textContent = data.game_id; // Fix: API returns game_id not gameId
-        currentPlayer = 'player1';
+        document.getElementById('currentGameId').textContent = data.game_id;
         startPolling();
     } catch (error) {
         showError('createGameError', 'Failed to create game. Please try again.');
@@ -64,23 +60,21 @@ async function createGame() {
     }
 }
 
-// Fix join game request URL and payload
 async function joinGame() {
     const gameId = document.getElementById('gameId').value.trim();
-    const playerName = document.getElementById('player2Name').value.trim();
-    
+    const playerName = CONFIG.username;
     if (!gameId || !playerName) {
         showError('joinGameError', 'Please enter both game ID and your name');
         return;
     }
 
     try {
-        const response = await fetch(`http://${CONFIG.apiUrl}:${CONFIG.port}/game/${gameId}/join`, { // Fix: Add gameId to URL
+        const response = await fetch(`http://${CONFIG.apiUrl}:${CONFIG.port}/game/${gameId}/join`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ playerName }) // Fix: Match JoinGameRequest model
+            body: JSON.stringify({ playerName })
         });
 
         if (!response.ok) {
@@ -89,7 +83,6 @@ async function joinGame() {
 
         const data = await response.json();
         document.getElementById('currentGameId').textContent = gameId;
-        currentPlayer = 'player2';
         startPolling();
     } catch (error) {
         showError('joinGameError', 'Failed to join game. Please try again.');
@@ -106,7 +99,7 @@ async function makeMove(move) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ move }) // Fix: Match MoveRequest model
+            body: JSON.stringify({ move })
         });
 
         if (!response.ok) {
