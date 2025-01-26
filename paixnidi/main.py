@@ -25,17 +25,17 @@ app.add_middleware(
 games: Dict[str, dict] = {}
 
 def check_winner(move1: str, move2: str) -> str:
-    valid_moves = ['rock', 'paper', 'scissors']
+    valid_moves = ['πέτρα', 'χαρτί', 'ψαλίδι']
     if move1 not in valid_moves or move2 not in valid_moves:
-        raise HTTPException(status_code=400, detail="Invalid move. Use: rock, paper, or scissors")
+        raise HTTPException(status_code=400, detail="Invalid move. Use: πέτρα, χαρτί, or ψαλίδι")
     
     if move1 == move2:
         return "tie"
     
     winning_moves = {
-        'rock': 'scissors',
-        'scissors': 'paper',
-        'paper': 'rock'
+        'πέτρα': 'ψαλίδι',
+        'ψαλίδι': 'χαρτί',
+        'χαρτί': 'πέτρα'
     }
     
     if winning_moves[move1] == move2:
