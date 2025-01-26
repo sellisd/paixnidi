@@ -1,7 +1,26 @@
 const CONFIG = {
-    apiUrl: 'localhost',
-    port: 8080
+  apiUrl: localStorage.getItem('apiUrl') || '192.168.1.6',
+  port: localStorage.getItem('port') || 8080
 };
+
+function saveConfig() {
+  const apiUrl = document.getElementById('apiUrl').value.trim();
+  const port = document.getElementById('portNumber').value.trim();
+
+  if (!apiUrl || !port) {
+      showError('configError', 'Please enter both API URL and port');
+      return;
+  }
+
+  localStorage.setItem('apiUrl', apiUrl);
+  localStorage.setItem('port', port);
+  CONFIG.apiUrl = apiUrl;
+  CONFIG.port = port;
+
+  const errorElement = document.getElementById('configError');
+  errorElement.textContent = 'Configuration saved';
+  errorElement.classList.remove('hidden');
+}
 
 let currentPlayer = '';
 let gameInterval;
@@ -149,4 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
             makeMove(e.target.dataset.move);
         }
     });
+    document.getElementById('apiUrl').value = CONFIG.apiUrl;
+    document.getElementById('portNumber').value = CONFIG.port;
 });
