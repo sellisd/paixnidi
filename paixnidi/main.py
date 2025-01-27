@@ -15,7 +15,11 @@ app = FastAPI()
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080", "http://127.0.0.1:8080", "https://sellisd.github.io","null"],
+    allow_origins=["http://localhost:8080",
+                   "http://localhost:8000",
+                   "http://127.0.0.1:8080",
+                   "https://sellisd.github.io",
+                   "null"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -45,7 +49,7 @@ def check_winner(move1: str, move2: str) -> str:
 # Request/Response Models
 class CreateGameRequest(BaseModel):
     player1: str
-    player2: str
+    player2: Optional[str] = None
 
 class JoinGameRequest(BaseModel):
     playerName: str
@@ -69,13 +73,13 @@ def create_game(game_request: CreateGameRequest):
     game_id = str(uuid.uuid4())
     games[game_id] = {
         "player1": game_request.player1,
-        "player2": game_request.player2,
+        "player2": None,  # Initially null until player 2 joins
         "move1": None,
         "move2": None,
-        "status": "active",
+        "status": "waiting",
         "winner": None
     }
-    return {"game_id": game_id}
+    return {"gameId": game_id}
 
 @app.post("/game/{game_id}/join")
 async def join_game(game_id: str, request: JoinGameRequest):

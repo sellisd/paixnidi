@@ -1,7 +1,10 @@
 import { CONFIG } from './config.js';
 
 export async function createGame() {
-    const response = await axios.post(`http://${CONFIG.apiUrl}:${CONFIG.port}/game/create`);
+    const response = await axios.post(`http://${CONFIG.apiUrl}:${CONFIG.port}/game/new`, {
+        player1: CONFIG.username,
+        player2: null  // Will be filled when player 2 joins
+    });
     return response.data;
 }
 

@@ -20,17 +20,74 @@ async function handleCreateGame() {
         const joinUrl = `${baseUrl}?gameId=${gameId}`;
         
         // Clear previous QR code
-        document.getElementById('qrcode').innerHTML = '';
-        
-        // Generate new QR code
-        QRCode.toCanvas(document.getElementById('qrcode'), joinUrl, function (error) {
-            if (error) {
-                console.error('Error generating QR code:', error);
-            }
-        });
+        const qrcodeElement = document.getElementById('qrcode');
+        qrcodeElement.innerHTML = '';
+        console.log('Creating QR code for URL:', joinUrl);
+
+        if (qrcodeElement) {
+            const qr = new QRCode(qrcodeElement, {
+                text: joinUrl,
+                width: 256,
+                height: 256,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        } else {
+            console.error('QR code element not found');
+        }
 
         startPolling();
     } catch (error) {
         showError('createGameError', 'Failed to create game');
+    }
+}
+
+async function handleJoinGame() {
+    try {
+        const gameId = document.getElementById('gameId').value;
+        const playerName = document.getElementById('player2Name').value;
+
+        if (!gameId || !playerName) {
+            showError('joinGameError', 'Please enter both game ID and player name');
+            return;
+        }
+
+        await joinGame(gameId, playerName);
+        document.getElementById('currentGameId').textContent = gameId;
+        document.getElementById('joinGameError').textContent = '';
+        
+        // Hide join section and show game section
+        document.getElementById('joinGame').style.display = 'none';
+        document.getElementById('gamePlay').style.display = 'block';
+        
+        startPolling();
+    } catch (error) {
+        showError('joinGameError', 'Failed to join game');
+    }
+}
+
+async function handleMove(event) {
+    if (!event.target.matches('button[data-move]')) {
+        return;
+    }
+
+    try {
+        const move = event.target.dataset.move;
+        const gameId = document.getElementById('currentGameId').textContent;
+        
+        if (!gameId) {
+            showError('result', 'No active game');
+            return;
+        }
+
+        await makeMove(gameId, move);
+        
+        // Disable move buttons after making a move
+        const moveButtons = document.querySelectorAll('#moves button');
+        moveButtons.forEach(button => button.disabled = true);
+        
+    } catch (error) {
+        showError('result', 'Failed to make move');
     }
 }
