@@ -60,28 +60,19 @@ async function createGame() {
     }
 }
 
-async function joinGame() {
-    const gameId = document.getElementById('gameId').value.trim();
-    const playerName = CONFIG.username;
+async function joinGame(gameId, playerName) {
+    gameId = gameId || document.getElementById('gameId').value.trim();
+    playerName = playerName || CONFIG.username;
     if (!gameId || !playerName) {
         showError('joinGameError', 'Please enter both game ID and your name');
         return;
     }
 
     try {
-        const response = await fetch(`http://${CONFIG.apiUrl}:${CONFIG.port}/game/${gameId}/join`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ playerName })
+        const response = await axios.post(`http://${CONFIG.apiUrl}:${CONFIG.port}/game/${gameId}/join`, {
+            playerName
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
         document.getElementById('currentGameId').textContent = gameId;
         startPolling();
     } catch (error) {
@@ -153,6 +144,10 @@ function startPolling() {
     gameInterval = setInterval(checkGameStatus, 1000);
 }
 
+function getUrlParams() {
+    return _.fromPairs(new URLSearchParams(window.location.search).entries());
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('createGameBtn').addEventListener('click', createGame);
     document.getElementById('joinGameBtn').addEventListener('click', joinGame);
@@ -163,4 +158,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     document.getElementById('apiUrl').value = CONFIG.apiUrl;
     document.getElementById('portNumber').value = CONFIG.port;
+
+    const params = getUrlParams();
+    if (params.gameId && params.playerName) {
+        joinGame(params.gameId, params.playerName);
+    }
 });
