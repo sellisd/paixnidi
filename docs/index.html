@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lodash/lodash.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.5.0/dist/easy.qrcode.min.js"></script>
     <script type="module" src="js/app.js"></script>
 </head>
 <body>
@@ -32,6 +32,8 @@
         <button id="createGameBtn">Create New Game</button>
         <div id="createGameError" class="error-message"></div>
         <div id="qrcode"></div>
+        <p>Game ID: <span id="currentGameId"></span></p>
+        <p>Status: <span id="gameStatus"></span></p>
     </div>
 
     <div id="joinGame" class="game-section">
@@ -42,8 +44,6 @@
     </div>
 
     <div id="gamePlay" class="game-section">
-        <p>Game ID: <span id="currentGameId"></span></p>
-        <p>Status: <span id="gameStatus"></span></p>
         <div id="moves">
             <button data-move="πέτρα">Πέτρα</button>
             <button data-move="χαρτί">Χαρτί</button>

@@ -25,13 +25,18 @@ async function handleCreateGame() {
         console.log('Creating QR code for URL:', joinUrl);
 
         if (qrcodeElement) {
-            const qr = new QRCode(qrcodeElement, {
+            new QRCode(qrcodeElement, {
                 text: joinUrl,
                 width: 256,
                 height: 256,
-                colorDark: '#000000',
-                colorLight: '#ffffff',
-                correctLevel: QRCode.CorrectLevel.H
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                quietZone: 15,
+                quietZoneColor: "transparent",
+                logoBackgroundTransparent: true,
+                onRenderingEnd: function(qrCodeOptions, dataURL) {
+                    console.log("QR code rendering complete");
+                }
             });
         } else {
             console.error('QR code element not found');
