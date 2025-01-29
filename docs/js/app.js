@@ -20,16 +20,36 @@ window.saveConfig = function() {
     }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-    setupEventHandlers();
-    
-    // Initialize form with current config values
+document.addEventListener('DOMContentLoaded', async () => {
+    // First set up configuration
     document.getElementById('apiUrl').value = CONFIG.apiUrl;
     document.getElementById('portNumber').value = CONFIG.port;
     document.getElementById('username').value = CONFIG.username;
 
+    // Set up event handlers
+    setupEventHandlers();
+
+    // Handle URL parameters
     const params = getUrlParams();
-    if (params.gameId && params.playerName) {
-        joinGame(params.gameId, params.playerName);
+    const gameId = params.gameId;
+    
+    if (gameId) {
+        // Fill in the game ID input
+        const gameIdInput = document.getElementById('gameId');
+        if (gameIdInput) {
+            gameIdInput.value = gameId;
+        }
+
+        // If we also have a player name, attempt to join
+        if (params.playerName) {
+            try {
+                await joinGame(gameId, params.playerName);
+                // Hide join section and show game section after successful join
+                document.getElementById('joinGame').style.display = 'none';
+                document.getElementById('gamePlay').style.display = 'block';
+            } catch (error) {
+                console.error('Failed to auto-join game:', error);
+            }
+        }
     }
 });
