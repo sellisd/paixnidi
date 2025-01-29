@@ -23,7 +23,6 @@ async function checkGameStatus() {
           throw new Error(`HTTP error! status: ${response.status}`);
       }
       const game = await response.json();
-      updateGameUI(game);
   } catch (error) {
       console.error('Error checking game status:', error);
   }
